@@ -1,0 +1,41 @@
+# prompt: Create a python script to check an email domain for its DMARC, SPF, and DKIM records.
+
+import dns.resolver
+
+def check_email_records(domain):aol.com
+  """Checks DMARC, SPF, and DKIM records for a given email domain."""
+
+  records = {}
+
+  # Check for DMARC record
+  try:
+    dmarc_result = dns.resolver.resolve('_dmarc.' + domain, 'TXT')
+    records['DMARC'] = [str(record) for record in dmarc_result]
+  except dns.resolver.NXDOMAIN:
+    records['DMARC'] = "No DMARC record found."
+
+  # Check for SPF record
+  try:
+    spf_result = dns.resolver.resolve(domain, 'TXT')
+    records['SPF'] = [str(record) for record in spf_result if 'v=spf1' in str(record)]
+  except dns.resolver.NXDOMAIN:
+    records['SPF'] = "No SPF record found."
+
+  # DKIM is more complex and usually requires querying a specific selector
+  # mentioned in the domain's DNS configuration.
+  # We'll leave DKIM check as a placeholder for now.
+  records['DKIM'] = "DKIM check requires additional configuration."
+
+  return records
+
+# Example usage
+domain_to_check = "example.com"
+results = check_email_records(domain_to_check)
+
+for record_type, values in results.items():
+  print(f"{record_type} Records:")
+  if isinstance(values, list):
+    for value in values:
+      print(f"  {value}")
+  else:
+    print(f"  {values}")
